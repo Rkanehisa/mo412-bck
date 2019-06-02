@@ -6,6 +6,7 @@ import sys
 import math
 import copy
 
+
 class Graph(): 
     def __init__(self, V): 
         self.V = V 
@@ -148,7 +149,7 @@ def BellmanFord(G, s):
                         return
         return dist,prev
 
-def Johnson(G):
+def JohnsonBinary(G):
     new_G = Graph(G.V+1)
     V = new_G.V
     new_G.graph = copy.copy(G.graph)
@@ -172,7 +173,7 @@ def Johnson(G):
     
     for i in range(new_G.V):
         src = i
-        dist,path = (dijkstra(new_G,src))
+        dist,path = (DijkstraBinary(new_G,src))
         distall[i] = dist
         prevall[i] = path
     return distall,prevall
@@ -201,7 +202,7 @@ def JohnsonFibHeap(G):
     
     for i in range(new_G.V):
         src = i
-        dist,path = (dijkstraFibHeap(new_G,src))
+        dist,path = (DijkstraFibHeap(new_G,src))
         distall[i] = dist
         prevall[i] = path
     return distall,prevall
@@ -230,7 +231,7 @@ def FloydWarshall(G):
                     prox[i][j] = prox[k][j]
     return dist,prox
 
-def dijkstra(G,s):
+def DijkstraBinary(G,s):
         V = G.V
         dist = []
         heap = Heap() 
@@ -261,7 +262,7 @@ def dijkstra(G,s):
                         
         return dist,prev
 
-def dijkstraFibHeap(G,s):
+def DijkstraFibHeap(G,s):
     V = G.V
     visited = [False]*V
     dist = [float(sys.maxsize)] * V
@@ -455,30 +456,3 @@ class FibonacciHeap():
                 self.cut(y, z)
                 self.cascading_cut(z)
 
-def getPath(prev,s):
-    path = [[] for i in range(len(prev))]   
-    for i in range(len(prev)):
-        path[i].append(i)
-        curr = prev[i]
-        while True:
-            if(curr == s):
-                break
-            path[i].append(curr)
-            if(curr != None):
-                curr = prev[curr]
-            else:
-                break
-    return path
-
-def printPath(src,dist,prev):
-    paths = getPath(prev,src)
-    
-    for i in range(0,len(dist)):
-        if(dist[i] < sys.maxsize):
-            print("%d" % dist[i],end="")
-            print(" v%d " % (src),end="")
-            for j in paths[i][::-1]:
-                print("v%d " % j, end="")
-            print(i)
-        else:
-            print("Inf v%d v%d %d" % (src,i,i))
