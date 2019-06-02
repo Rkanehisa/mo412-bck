@@ -5,13 +5,13 @@ from collections import defaultdict
 import sys
 import math
 import copy
-
+from fibHeap import FibonacciHeap
+from binaryHeap import Heap
 
 class Graph(): 
     def __init__(self, V): 
         self.V = V 
         self.graph = defaultdict(list)
-      
     
     def vertices(self):
         return list(self.graph)
@@ -21,110 +21,7 @@ class Graph():
     
     def addEdge(self, src, dest, weight):
         newNode = [dest, weight] 
-        self.graph[src].insert(0, newNode) 
-
-
-class Heap(): 
-  
-    def __init__(self): 
-        self.array = [] 
-        self.size = 0
-        self.pos = [] 
-  
-    def newMinHeapNode(self, v, dist): 
-        minHeapNode = [v, dist] 
-        return minHeapNode 
-  
-    # A utility function to swap two nodes  
-    # of min heap. Needed for min heapify 
-    def swapMinHeapNode(self,a, b): 
-        t = self.array[a] 
-        self.array[a] = self.array[b] 
-        self.array[b] = t 
-  
-    # A standard function to heapify at given idx 
-    # This function also updates position of nodes  
-    # when they are swapped.Position is needed  
-    # for decreaseKey() 
-    def minHeapify(self, idx): 
-        smallest = idx 
-        left = 2*idx + 1
-        right = 2*idx + 2
-  
-        if (left < self.size and self.array[left][1] < self.array[smallest][1]): 
-            smallest = left 
-  
-        if (right < self.size and self.array[right][1] < self.array[smallest][1]): 
-            smallest = right 
-  
-        # The nodes to be swapped in min  
-        # heap if idx is not smallest 
-        if (smallest != idx): 
-  
-            # Swap positions 
-            self.pos[ self.array[smallest][0] ] = idx 
-            self.pos[ self.array[idx][0] ] = smallest 
-  
-            # Swap nodes 
-            self.swapMinHeapNode(smallest, idx) 
-  
-            self.minHeapify(smallest) 
-  
-    # Standard function to extract minimum  
-    # node from heap 
-    def extractMin(self): 
-  
-        # Return NULL wif heap is empty 
-        if self.isEmpty() == True: 
-            return
-  
-        # Store the root node 
-        root = self.array[0] 
-  
-        # Replace root node with last node 
-        lastNode = self.array[self.size - 1] 
-        self.array[0] = lastNode 
-  
-        # Update position of last node 
-        self.pos[lastNode[0]] = 0
-        self.pos[root[0]] = self.size - 1
-  
-        # Reduce heap size and heapify root 
-        self.size -= 1
-        self.minHeapify(0) 
-  
-        return root 
-  
-    def isEmpty(self): 
-        return True if self.size == 0 else False
-  
-    def decreaseKey(self, v, dist): 
-  
-        # Get the index of v in  heap array 
-  
-        i = self.pos[v] 
-  
-        # Get the node and update its dist value 
-        self.array[i][1] = dist 
-  
-        # Travel up while the complete tree is  
-        # not hepified. This is a O(Logn) loop 
-        while (i > 0 and self.array[i][1] < self.array[(i - 1) // 2][1]): 
-  
-            # Swap this node with its parent 
-            self.pos[ self.array[i][0] ] = (i-1)/2
-            self.pos[ self.array[(i-1)//2][0] ] = i 
-            self.swapMinHeapNode(i, (i - 1)//2 ) 
-  
-            # move to parent index 
-            i = (i - 1) // 2; 
-  
-    # A utility function to check if a given  
-    # vertex 'v' is in min heap or not 
-    def isInMinHeap(self, v):
-        if (self.pos[v] < self.size): 
-            return True
-        return False
+        self.graph[src].insert(0, newNode)
 
 def BellmanFord(G, s):
         dist = [sys.maxsize] * G.V
@@ -149,64 +46,6 @@ def BellmanFord(G, s):
                         return
         return dist,prev
 
-def JohnsonBinary(G):
-    new_G = Graph(G.V+1)
-    V = new_G.V
-    new_G.graph = copy.copy(G.graph)
-    for i in range(G.V):
-        new_G.addEdge(V-1,i,0)
-    out = BellmanFord(new_G,V-1)
-    dist,path = out
-    
-    for i,j in new_G.edges().items():
-        if(i != V-1):
-            for k in j:
-                u = i
-                v,w = k
-                k[1]+=dist[u]-dist[v]
-    
-    new_G.graph.pop(V-1)
-    new_G.V = G.V
-    
-    distall = [[] for i in range(G.V)]
-    prevall = [[] for i in range(G.V)]
-    
-    for i in range(new_G.V):
-        src = i
-        dist,path = (DijkstraBinary(new_G,src))
-        distall[i] = dist
-        prevall[i] = path
-    return distall,prevall
-
-def JohnsonFibHeap(G):
-    new_G = Graph(G.V+1)
-    V = new_G.V
-    new_G.graph = copy.copy(G.graph)
-    for i in range(G.V):
-        new_G.addEdge(V-1,i,0)
-    out = BellmanFord(new_G,V-1)
-    dist,path = out
-    
-    for i,j in new_G.edges().items():
-        if(i != V-1):
-            for k in j:
-                u = i
-                v,w = k
-                k[1]+=dist[u]-dist[v]
-    
-    new_G.graph.pop(V-1)
-    new_G.V = G.V
-    
-    distall = [[] for i in range(G.V)]
-    prevall = [[] for i in range(G.V)]
-    
-    for i in range(new_G.V):
-        src = i
-        dist,path = (DijkstraFibHeap(new_G,src))
-        distall[i] = dist
-        prevall[i] = path
-    return distall,prevall
-
 def FloydWarshall(G): 
     V = G.V
     dist = [[sys.maxsize] * V for i in range(V)]
@@ -230,6 +69,24 @@ def FloydWarshall(G):
                     dist[i][j] = dist[i][k]+ dist[k][j]
                     prox[i][j] = prox[k][j]
     return dist,prox
+
+def dijkstraArray(G, src):  
+    dist = [sys.maxsize] * G.V 
+    prev = [None] * G.V 
+    dist[src] = 0
+    prev[src] = src
+    visited = [False] * G.V 
+
+    for i in range(G.V):
+        u = extract_min(dist,visited)
+        if(u != -1):
+            visited[u] = True
+            for k in G.graph[u]:
+                v,w = k
+                if (visited[v] == False and dist[v] != float("Inf") and dist[u] + w < dist[v]):
+                    dist[v] = dist[u] + w
+                    prev[v] = prev[u]
+    return dist,prev
 
 def DijkstraBinary(G,s):
         V = G.V
@@ -289,170 +146,89 @@ def DijkstraFibHeap(G,s):
                 prev[v]= u
     return dist,prev
 
-class HeapNode():
-        def __init__(self, key,pos):
-            self.key = key
-            self.pos = pos
-            self.child = None
-            self.parent = None
-            self.next = self.prev = None
-            self.degree = 0
-            self.mark = False
-            
+def JohnsonArray(G):
+    new_G = Graph(G.V+1)
+    V = new_G.V
+    new_G.graph = copy.copy(G.graph)
+    for i in range(G.V):
+        new_G.addEdge(V-1,i,0)
+    out = BellmanFord(new_G,V-1)
+    dist,path = out
     
+    for i,j in new_G.edges().items():
+        if(i != V-1):
+            for k in j:
+                u = i
+                v,w = k
+                k[1]+=dist[u]-dist[v]
+    
+    new_G.graph.pop(V-1)
+    new_G.V = G.V
+    
+    distall = [[] for i in range(G.V)]
+    prevall = [[] for i in range(G.V)]
+    
+    for i in range(new_G.V):
+        src = i
+        dist,path = (dijkstraArray(new_G,src))
+        distall[i] = dist
+        prevall[i] = path
+    return distall,prevall
 
-class FibonacciHeap():
-    def __init__(self,V):
-        
-        self.total_nodes = 0
-        self.pos = [None for i in range(V)]
-        self.min = None
-        
-    def insertion(self,key,pos):
-        new_node = HeapNode(key,pos)
-        new_node.next = new_node
-        new_node.prev = new_node
-        self.insert_on_root(new_node)
-        self.pos[pos] = new_node
-        self.total_nodes += 1
-        return new_node
+def JohnsonBinary(G):
+    new_G = Graph(G.V+1)
+    V = new_G.V
+    new_G.graph = copy.copy(G.graph)
+    for i in range(G.V):
+        new_G.addEdge(V-1,i,0)
+    out = BellmanFord(new_G,V-1)
+    dist,path = out
     
-    def iterate(self, head):
-        node = stop = head
-        flag = False
-        while True:
-            if node == stop and flag is True:
-                break
-            elif node == stop:
-                flag = True
-            yield node
-        node = node.next
+    for i,j in new_G.edges().items():
+        if(i != V-1):
+            for k in j:
+                u = i
+                v,w = k
+                k[1]+=dist[u]-dist[v]
     
-    def insert_on_root(self,x):
-        x.parent = None
-        if(self.min != None):
-            z = self.min
-            x.prev = z
-            x.next = z.next
-            z.next.prev = x
-            z.next = x
-        else:
-            self.min = x
-             
-    def remove_from_root(self,x):
-        if (x == self.min):
-            self.min = x.next
-        x.next.prev = x.prev
-        x.prev.next = x.next
-        
-    def extract_min(self):
-        z = self.min
-        if(z != None):
-            if (z.child != None):
-                nodes = [w for w in self.iterate(z.child)]
-                for x in range(0, len(nodes)):
-                    self.insert_on_root(x)
-                    x.parent = None
-            self.remove_from_root(z)
-            if (self.total_nodes ==0):
-                self.min = None
-            else:
-                self.consolidate()
-            self.total_nodes -= 1
-        return z
+    new_G.graph.pop(V-1)
+    new_G.V = G.V
     
+    distall = [[] for i in range(G.V)]
+    prevall = [[] for i in range(G.V)]
     
-    def consolidate(self):
-        golden_ratio = int(math.log(self.total_nodes,1.6810))
-        golden_ratio += 1
-        A = [None for i in range(self.total_nodes)]
-        for i in range(golden_ratio):
-            A[i] = None
-        w = self.min
-        nodes = [w for w in self.iterate(self.min)]
-        for w in range(0, len(nodes)):
-            x = nodes[w]
-            d = x.degree
-            while(A[d] != None):
-                y = A[d]
-                if(x.key > y.key):
-                    x,y = y,x
-                self.fibonacciLink(y,x)
-                A[d] = None
-                d += 1
-            A[d] = x
-            
-        self.min = None
-        for i in range(len(A)):
-            if(A[i] != None):
-                self.insert_on_root(A[i])
-                if(self.min == None or self.min.key < A[i].key):
-                    self.min = A[i]
-    
-    
-    def fibonacciLink(self,x,y):
-        self.remove_from_root(x)
-        self.insert_on_child(y,x)
-        y.mark = False
-    
-    def insert_on_child(self,x,y):
-        x.parent = y
-        if(y.child == None):
-            y.child = x
-        else:
-            x.next = y.child.next
-            x.prev = y.child
-            y.child.next.prev = x
-            y.child.next = x
-        y.degree+=1
-        
-    def remove_from_child(self,x,y):
-        if(y.child == y.child.next):
-            y.child = None
-        elif y.child == x:
-            y.child = x.next
-            y.next.parent = y
-        x.prev.next = x.next
-        x.next.prev = x.prev
-        
-    def printRoots(self,x):
-        z = x
-        if(z == None):
-            print("Empty")
-        else:
-            tmp = z
-            while(True):
-                print("pos=%d key=%f next=%d" % (tmp.pos,tmp.key,tmp.next.pos))
-                tmp = tmp.next
-                if(tmp == z):
-                    break
-            print()
-    
-    
-    def decrease_key(self,x,key):
-        if(x.key > key):
-            x.key = key
-            y = x.parent
-            if(y != None and x.key < y.key):
-                self.cut(x,y)
-                self.cascade_cut(y)
-            if(x.key < self.min.key):
-                self.min = x
-    
-    def cut(self,x,y):
-        self.insert_on_root(x)
-        self.remove_from_child(x,y)
-        y.degree -=1
-        x.parent = None
-        x.mark = False
-        
-        
-    def cascade_cut(self,y):
-        z = y.parent
-        if(z != None):
-            if(y.mark == False):
-                y.mark = True
-            else:
-                self.cut(y, z)
-                self.cascading_cut(z)
+    for i in range(new_G.V):
+        src = i
+        dist,path = (DijkstraBinary(new_G,src))
+        distall[i] = dist
+        prevall[i] = path
+    return distall,prevall
 
+def JohnsonFibHeap(G):
+    new_G = Graph(G.V+1)
+    V = new_G.V
+    new_G.graph = copy.copy(G.graph)
+    for i in range(G.V):
+        new_G.addEdge(V-1,i,0)
+    out = BellmanFord(new_G,V-1)
+    dist,path = out
+    
+    for i,j in new_G.edges().items():
+        if(i != V-1):
+            for k in j:
+                u = i
+                v,w = k
+                k[1]+=dist[u]-dist[v]
+    
+    new_G.graph.pop(V-1)
+    new_G.V = G.V
+    
+    distall = [[] for i in range(G.V)]
+    prevall = [[] for i in range(G.V)]
+    
+    for i in range(new_G.V):
+        src = i
+        dist,path = (DijkstraFibHeap(new_G,src))
+        distall[i] = dist
+        prevall[i] = path
+    return distall,prevall

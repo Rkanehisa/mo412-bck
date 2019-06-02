@@ -1,12 +1,12 @@
 import grafos
 import sys
 
-def Dijsktra(G,src):
-    dist,path = grafos.dijkstra(G,src)
+def DijkstraBinary(G,src):
+    dist,path = grafos.DijkstraBinary(G,src)
     return dist,path
 
 def DijkstraFibHeap(G,src):
-    dist,path = grafos.dijkstraFibHeap(G,src)
+    dist,path = grafos.DijkstraFibHeap(G,src)
     return dist,path
 
 def BellmanFord(G,src):
@@ -38,7 +38,6 @@ def inputfile(in_file):
     a = f.read()
     b = a.split('\n')
     G = grafos.Graph(int(b[0]))
-    print(b[2])
     src = (int(b[2]))
     for i in range(3,len(b)):
         tmp = b[i].split(" ")
@@ -89,12 +88,12 @@ def main(alg,version,in_file,out_file):
 
     if(alg.lower() == "dijkstra"):
         if(version == 0):
-            print("Dijkstra with array Heap")
+            print("Dijkstra with Array Heap")
             dist,prev = DijsktraArray(graph,src)
             printPath(src,dist,prev,out)
 
         elif(version == 1):
-            print("Dijkstra with binary Heap")
+            print("Dijkstra with Binary Heap")
             dist,prev =  DijkstraBinary(graph,src)
             printPath(src,dist,prev,out)
 
@@ -112,7 +111,7 @@ def main(alg,version,in_file,out_file):
 
 
     elif(alg.lower() == "floyd-warshall"):
-        print("Floyd-Warshal")
+        print("Floyd Warshal")
         dist,prev = FloydWarshall(graph)
         for i in range(len(prev)):
             printPath(i,dist[i],prev[i],out)
