@@ -41,7 +41,8 @@ def inputfile(in_file):
     src = (int(b[2]))
     for i in range(3,len(b)):
         tmp = b[i].split(" ")
-        G.addEdge(int(tmp[0]),int(tmp[1]),float(tmp[2]))
+        if(len(tmp) == 3):
+            G.addEdge(int(tmp[0]),int(tmp[1]),float(tmp[2]))
     return G,src
 
 
